@@ -1,18 +1,28 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <div class="square">
+     <div class="square">
+      <div class="circle">
+      </div>
+    </div>
+  <!--  <div class="square">
       <div class="circle">
       </div>
     </div>
     <div class="square">
       <div class="circle">
       </div>
-    </div>
-    <div class="square">
-      <div class="circle">
-      </div>
-    </div>
+    </div> -->
+    <table>
+      <tbody>
+        <tr v-for="(data, index) in 20" :key="index">
+          <td v-for="(data, index) in 20" :key="index" class="square" :click="squareClick">
+              <div class="circle">
+              </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -22,6 +32,15 @@ export default {
   data () {
     return {
       msg: 'Welcome to Your Path Finder Vue.js App'
+    }
+  },
+  beforeMount () {
+    // create a 8x8 matrix, with all values set to 0
+    // let my2Darray = Array.matrix(8, 8, 0)
+  },
+  methods: {
+    squareClick () {
+      console.log(this)
     }
   }
 }
@@ -54,6 +73,8 @@ a {
 .circle {
   height: 100%;
   width: 100%;
+  top: 0px;
+  right: 0px;
   position: absolute;
   background-color: orange;
   border-radius: 50%;
