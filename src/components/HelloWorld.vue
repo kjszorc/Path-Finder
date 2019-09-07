@@ -1,10 +1,10 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-     <div class="square">
+     <!-- <div class="square">
       <div class="circle">
       </div>
-    </div>
+    </div> -->
   <!--  <div class="square">
       <div class="circle">
       </div>
@@ -15,10 +15,10 @@
     </div> -->
     <table>
       <tbody>
-        <tr v-for="(data, index) in 20" :key="index">
-          <td v-for="(data, index) in 20" :key="index" class="square" :click="squareClick">
-              <div class="circle">
-              </div>
+        <tr v-for="(data, index) in width" :key="index">
+          <td v-for="(data1, index1) in height" :key="index1" refs="" class="square" @click="squareClick(index, index1, $event)">
+            <div class="">
+            </div>
           </td>
         </tr>
       </tbody>
@@ -27,11 +27,14 @@
 </template>
 
 <script>
+/* es-lint disable */
 export default {
   name: 'HelloWorld',
   data () {
     return {
-      msg: 'Welcome to Your Path Finder Vue.js App'
+      msg: 'Welcome to Your Path Finder Vue.js App',
+      height: 20,
+      width: 10
     }
   },
   beforeMount () {
@@ -39,8 +42,13 @@ export default {
     // let my2Darray = Array.matrix(8, 8, 0)
   },
   methods: {
-    squareClick () {
-      console.log(this)
+    squareClick: function (index, index1, e) {
+      // debugger
+      e.srcElement.firstChild.classList.add('circle')
+
+      console.log(e.srcElement)
+      console.log(index, index1)
+      // alert('greetings')
     }
   }
 }
@@ -69,6 +77,9 @@ a {
   background-color: lightgrey;
   position: relative;
 
+}
+.square:hover {
+  cursor: pointer;
 }
 .circle {
   height: 100%;
