@@ -1,7 +1,8 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <button class="btn--start">Run</button>
+    <button class="btn--start" @click="runClick">Run</button>
+    <button class="btn--start" @click="clearClick">Clear</button>
      <!-- <div class="square">
       <div class="circle">
       </div>
@@ -16,9 +17,9 @@
     </div> -->
     <table ref="table">
       <tbody>
-        <tr v-for="(rowValue, row) in width" :key="row" ref="row">
-          <td v-for="(colValue, col) in height" :key="col" class="square" ref="col" @click="squareClick(row, col, $event)">
-            <div class="" >
+        <tr v-for="(rowValue, row) in grid" :key="row" ref="row">
+          <td v-for="(colValue, col) in rowValue" :key="col" class="square" ref="col" @click="squareClick(row, col, $event)">
+            <div :class="{'circle': colValue }">
             </div>
           </td>
         </tr>
@@ -35,22 +36,63 @@ export default {
     return {
       msg: 'Welcome to Your Path Finder Vue.js App',
       height: 20,
-      width: 10,
-      grid: [[], []]
+      width: 10
+      // ,
+      // grid: [[], []]
     }
   },
+
   beforeMount () {
-    // create a 8x8 matrix, with all values set to 0
-    // this.my2Darray = Array.matrix(8, 8, 0)
+    this.grid = [];
+    for(let i=0; i<this.width; i++) {
+      this.grid.push([]);
+      for(let j=0; j<this.height; j++) {
+        this.grid[i].push(true);
+      }
+    }
   },
+
   methods: {
     squareClick: function (row, col) {
       // debugger
       this.setCircle(row, col, 'blue')
-      setTimeout(this.setCircle(row + 1, col + 1), 1000)
+      this.blueDot = {
+        'row': row,
+        'col': col
+      }
+      // setTimeout(this.setCircle(row + 1, col + 1), 1000)
       // console.log(this.grid)
       // console.log(e.srcElement)
       // console.log(index, index1)
+    },
+    clearClick: function () {
+      // this.grid.forEach(function (row) {
+      //   row.forEach(function (col) {
+      //     console.log(col)
+      //     console.log(row)
+      //     const cell = this.$refs.row[row].children[col]
+      //     debugger
+      //   });
+      // });
+      this.grid = [[], []];
+    },
+
+    runClick: function () {
+      // console.log(this.blueDot)
+      const row = this.blueDot.row
+      const col = this.blueDot.col
+      if (row + 1 < this.width) {
+        setTimeout(this.setCircle(row + 1, col), 1000)
+      }
+      if (col + 1 < this.height) {
+          setTimeout(this.setCircle(row, col + 1), 1000)
+        }
+      if (row - 1 > 0) {
+        setTimeout(this.setCircle(row - 1, col), 1000)
+      }
+      if (col - 1 > 0) {
+        setTimeout(this.setCircle(row, col - 1), 1000)
+      }
     },
 
     setCircle: function (row, col, color = 'orange') {
@@ -59,10 +101,10 @@ export default {
       } 
       if (!this.grid[row][col]) {
         this.grid[row][col] = true
-        // const l = row + '-' + col
-        const cell = this.$refs.row[row].children[col].firstChild
-        cell.classList.add('circle')
-        cell.classList.add(color)
+        debugger
+        // const cell = this.$refs.row[row].children[col].firstChild
+        // cell.classList.add('circle')
+        // cell.classList.add(color)
       }
     }
 
