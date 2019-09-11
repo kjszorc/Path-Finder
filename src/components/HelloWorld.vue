@@ -19,7 +19,7 @@
       <tbody>
         <tr v-for="(rowValue, row) in grid" :key="row" ref="row">
           <td v-for="(colValue, col) in rowValue" :key="col" class="square" ref="col" @click="squareClick(row, col, $event)">
-            <div :class="{'circle': colValue }">
+            <div :class="{'circle': hasCircle(1, 1) }">
             </div>
           </td>
         </tr>
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-/* es-lint disable */
+/* eslint-disable */
 export default {
   name: 'HelloWorld',
   data () {
@@ -48,11 +48,19 @@ export default {
       this.grid.push([]);
       for(let j=0; j<this.height; j++) {
         this.grid[i].push(true);
+        // debugger;
       }
     }
+    // debugger
   },
 
   methods: {
+    hasCircle(row, col) {
+      // debugger
+      console.log((this.grid && this.grid[row] && this.grid[row][col]))
+      return (this.grid && this.grid[row] && this.grid[row][col])
+    },
+
     squareClick: function (row, col) {
       // debugger
       this.setCircle(row, col, 'blue')
@@ -107,7 +115,6 @@ export default {
         // cell.classList.add(color)
       }
     }
-
   }
 }
 </script>
