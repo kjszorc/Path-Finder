@@ -7,14 +7,6 @@
       <div class="circle">
       </div>
     </div> -->
-  <!--  <div class="square">
-      <div class="circle">
-      </div>
-    </div>
-    <div class="square">
-      <div class="circle">
-      </div>
-    </div> -->
     <table ref="table">
       <tbody>
         <tr v-for="(rowValue, row) in grid" :key="row" ref="row">
