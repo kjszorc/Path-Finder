@@ -48,7 +48,6 @@ export default {
 
   methods: {
     hasCircle(row, col) {
-      // debugger
       console.log((this.grid && this.grid[row] && this.grid[row][col]))
       return (this.grid && this.grid[row] && this.grid[row][col])
     },
