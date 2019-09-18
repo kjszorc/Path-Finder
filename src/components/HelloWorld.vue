@@ -62,7 +62,6 @@ export default {
       // setTimeout(this.setCircle(row + 1, col + 1), 1000)
       // console.log(this.grid)
       // console.log(e.srcElement)
-      // console.log(index, index1)
     },
     clearClick: function () {
       // this.grid.forEach(function (row) {
