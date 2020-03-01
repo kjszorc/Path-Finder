@@ -1,18 +1,18 @@
 <template>
   <div id="app">
     <img src="./assets/logo.png">
-    <HelloWorld/>
+    <PathFinder/>
   </div>
 </template>
 
 <script>
 
-import HelloWorld from './components/HelloWorld'
+import PathFinder from './components/PathFinder'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    PathFinder
   }
 }
 </script>
