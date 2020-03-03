@@ -7,27 +7,33 @@
       <div class="circle">
       </div>
     </div> -->
-    <div class="">
-      <label>
-        Place Starting point:
-        <input type="radio" v-model="pointType" value="0"/>
-      </label>
-      <label>
-        Walls:
-        <input type="radio" v-model="pointType" value="1"/>
-      </label>
-      <label>
-        Place Ending point:
-        <input type="radio" v-model="pointType" value="2"/>
-      </label>
-    </div>
+
+    <!-- {{grid}} -->
+    <section class="dot-options">
+      <div class="dot-option">
+        <label>
+          Place Starting point:
+          <input type="radio" v-model="pointType" value="0"/>
+        </label>
+      </div>
+      <div class="dot-option">
+        <label>
+          Walls:
+          <input type="radio" v-model="pointType" value="1"/>
+        </label>
+      </div>
+      <div class="dot-option">
+        <label>
+          Place Ending point:
+          <input type="radio" v-model="pointType" value="2"/>
+        </label>
+      </div>
+    </section>
     <table class="table-path" ref="table" v-if="loaded">
       <tbody>
-        <tr v-for="(rowValue, row) in grid" :key="row" ref="row">
-          <td v-for="(colValue, col) in rowValue" :key="col" class="square" ref="col" @click="squareClick(row, col, $event)">
-            <!-- <div> -->
-            <div :class="{'circle blue':  !hasCircle(row, col) }">
-              <!-- hasCircle(1, 1) -->
+        <tr v-for="(rowValue, row, index) in grid" :key="index" ref="row">
+          <td v-for="(colValue, col, indexC) in rowValue" :key="indexC" class="square" ref="col" @click="squareClick(row, col, $event)">
+            <div :class="[{'circle':  colValue.hasDot}, colValue.color]" :style="{ 'animation-duration': colValue.delay}">
             </div>
           </td>
         </tr>
@@ -38,171 +44,137 @@
 
 <script>
 /* eslint-disable */
+const start = 0,
+      wall  = 1,
+      end   = 2;
+
+const color = {
+  0: 'blue',
+  1: 'purple',
+  2: 'red',
+  'path': 'orange',
+};
+
+// maybe we can make the array class based
+class cell {
+
+}
 export default {
   name: 'PathFinder',
   data () {
     return {
-      msg: 'A small Vue.js App',
+      msg: '',//'A small Vue.js App',
       loaded: false,
       pointType: 0,
       height: 5,
       width: 5,
-      start: 0,
-      wall: 1,
-      end: 2,
       grid: Array.apply(null, {length: 5}).map(x => 
-              (Array.apply(null, {length: 5}).map(x => true))),
-      blueDot: {
+              (Array.apply(null, {length: 5}).map(x => Object.assign({ hasDot: false, color: null}) ))),
+      startDot: {
         'row': null,
         'col': null,
       },
-      redDot: {
+      endDot: {
         'row': null,
         'col': null,
-      }
+      },
     }
   },
 
-  beforeMount () {
-    //this.setGrid();
-  },
   mounted () {
     this.loaded = true;
   },
-
-  // computed: {
-  //   hasCircle: function (row, col) {
-  //     // console.log((this.grid && this.grid[row] && this.grid[row][col]))
-  //     return (this.grid && this.grid[row] && this.grid[row][col])
-  //   },
-  // },
   methods: {
-   hasCircle(row, col) {
-      // console.log((this.grid && this.grid[row] && this.grid[row][col]))
-      // return (this.grid && this.grid[row] && this.grid[row][col])
-      return this.grid[row][col]
-    },
     squareClick: function (row, col) {
-      if (this.pointType == this.start) {
-        debugger
-        // if (this.blueDot.row != null)
-          // clearCircle(this.blueDot);
-        this.blueDot.row = row;
-        this.blueDot.col = col;
-        this.grid[row][col] = false;
-        // this.setCircle(row, col, 'blue')
+      if (this.pointType == start) {
+        if (this.startDot.row != null)
+          this.clearCircle(this.startDot);
+        this.startDot.row = row;
+        this.startDot.col = col;
+        this.grid[row].splice(col, 1, {hasDot: true, color: color[this.pointType]})
       }
-        
-      else if (this.pointType == this.wall) 
-        this.setCircle(row, col, 'purple')
-      else if (this.pointType == this.end) {
-        if (this.redDot.row != null)
-            clearCircle(this.redDot);
-        this.redDot.row = row;
-        this.redDot.col = col;
-        this.setCircle(row, col, 'red')
+      else if (this.pointType == wall) {
+        if (this.grid[row][col][0])
+          this.clearCircle({row: row, col: col});
+        else
+          this.grid[row].splice(col, 1, {hasDot: true, color: color[this.pointType]})
       }
-
-
-      // setTimeout(this.setCircle(row + 1, col + 1), 1000)
-      // console.log(this.grid)
-      // console.log(e.srcElement)
+      else if (this.pointType == end) {
+        if (this.endDot.row != null)
+          this.clearCircle(this.endDot);
+        this.endDot.row = row;
+        this.endDot.col = col;
+        this.grid[row].splice(col, 1, {hasDot: true, color: color[this.pointType]})
+      }
     },
     clearClick: function () {
-      this.grid.forEach(function (row , r) {
-        row.forEach(function (col, c) {
-          // console.log(col)
-          // console.log(row)
-          col = true;
-          debugger;
-          const cell = this.$el.$refs.row[r].children[c];
-          cell.classList = [];
-        });
-      });
-      // this.grid = [[], []];
-      // this.setGrid();
+      this.grid = Array.apply(null, {length: 5}).map(x => 
+        (Array.apply(null, {length: 5}).map(x => Object.assign({ hasDot: false, color: null}) )))
+      this.startDot.row = null
+      this.endDot.row = null
     },
     clearCircle: function(dot) {
-      debugger;
-      this.grid[dot.row][dot.col] = true
-      const cell = this.$refs.row[dot.row].children[dot.col].firstChild
-      cell.classList.remove('circle')
-      cell.classList = []
+      this.grid[dot.row].splice(dot.col, 1, { hasDot: false, color: null})
     },
 
     runClick: function () {
-      // console.log(this.blueDot)
       this.counter = 0;
-      const row = this.blueDot.row
-      const col = this.blueDot.col
+      const row = this.startDot.row
+      const col = this.startDot.col
+      // const level = 0
       this.fillTable(row, col);
     },
-    fillTable: function(row, col) {
+    // level is not passed in by value? but by reference
+    fillTable: function(row, col, l = 0) {
       if (row >= 0 &&
          row < this.width && 
          col >= 0 &&
          col < this.height) {
-           
+        let level = l
+        console.log('location: ', row, ' x ', col, ' Level: ', level)
+        // this.grid[this.endDot.row][this.endDot.col].hasDot
+        
         if (row + 1 < this.width) {
+          // debugger
+          console.log('try 1')
           // setTimeout(
-            this.setCircle(row + 1, col);
+          if (this.setCircle(row + 1, col, level))
+            this.fillTable(row + 1, col, 1 + level);
             // , 1);
-          // this.fillTable(row + 1, col);
         }
         if (col + 1 < this.height) {
+          console.log('try 2')
             // setTimeout(
-              this.setCircle(row, col + 1);
               // , 1);
-            // this.fillTable(row, col + 1);
+            if (this.setCircle(row, col + 1, level))
+              this.fillTable(row, col + 1, 1 + level);
           }
-        if (row - 1 > 0) {
+        if (row - 1 >= 0) {
+          console.log('try 3')
           // setTimeout(
-            this.setCircle(row - 1, col)
+          if (this.setCircle(row - 1, col, level))
+            this.fillTable(row - 1, col, level + 1);
             // , 1);
-          // this.fillTable(row - 1, col);
         }
-        if (col - 1 > 0) {
+        if (col - 1 >= 0) {
+          console.log('try 4')
           // setTimeout(
-            this.setCircle(row, col - 1)
+          if (this.setCircle(row, col - 1, level))
+            this.fillTable(row, col - 1, level + 1);
             // , 1);
-          // this.fillTable(row, col - 1);
         }
-        setTimeout(() => {
-          this.fillTable(row    , col + 1);
-          this.fillTable(row - 1, col    );
-          this.fillTable(row + 1, col    );
-          this.fillTable(row    , col - 1);
-        }, this.counter);
-        this.counter += 1;
         
       }
 
     },
 
-    setCircle: function (row, col, color = 'orange') {
-      if (!this.grid[row]) {
-        this.grid[row] = []
-      } 
-      if (this.grid[row][col] == true) {
-        this.grid[row][col] = false;
-        const cell = this.$refs.row[row].children[col].firstChild
-        cell.classList.add('circle')
-        cell.classList.add(color)
+    setCircle: function (row, col, delay, pathColor = 'path') {
+      if (this.grid[row][col].hasDot == false){
+        this.grid[row].splice(col, 1, {hasDot: true, color: color[pathColor], delay: delay + 's'})
+        return true;
       }
+      return false;
     },
-    setGrid: function () {
-      let grid = [];
-      for(let i=0; i<this.width; i++) {
-        grid.push([]);
-        for(let j=0; j<this.height; j++) {
-          grid[i].push(true);
-          // debugger;
-        }
-      }
-      this.grid = grid;
-      return;
-      // debugger
-    }
   },
 
 
@@ -245,8 +217,7 @@ a {
   border-radius: 50%;
   display: inline-block;
   margin: auto;
-  animation: changeColor 2s;
-
+  animation: changeColor 1s;
 }
 
 .circle.orange {
@@ -275,6 +246,16 @@ a {
   margin: auto;
 }
 
+.dot-options {
+  display: flex;
+  flex-direction: column;
+}
+.dot-option {
+  /* margin: auto; */
+}
+.dot-option label {
+  /* float: right; */
+}
 @keyframes changeColor {
     from {
       height: 0%;
