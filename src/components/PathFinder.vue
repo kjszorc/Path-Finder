@@ -2,7 +2,7 @@
   <div class="hello">
     <h1>{{ msg }}</h1>
     <button class="btn--start" @click="runClick">Run</button>
-    <button class="btn--start" @click="clearClick">Clear</button>
+    <button class="btn--start" @click="clearGridClick">Clear</button>
      <!-- <div class="square">
       <div class="circle">
       </div>
@@ -34,11 +34,13 @@
         <tr v-for="(rowValue, row, index) in grid" :key="index" ref="row">
           <td v-for="(colValue, col, indexC) in rowValue" :key="indexC" class="square" ref="col" @click="squareClick(row, col, $event)">
             <div :class="[{'circle':  colValue.hasDot}, colValue.color]" :style="{ 'animation-duration': colValue.delay}">
+              {{row }}, {{col}}
             </div>
           </td>
         </tr>
       </tbody>
     </table>
+    <div v-if="isDone">All done!</div>
   </div>
 </template>
 
@@ -78,6 +80,7 @@ export default {
         'row': null,
         'col': null,
       },
+      isDone: false,
     }
   },
 
@@ -107,17 +110,24 @@ export default {
         this.grid[row].splice(col, 1, {hasDot: true, color: color[this.pointType]})
       }
     },
-    clearClick: function () {
+    clearGridClick: function () {
       this.grid = Array.apply(null, {length: 5}).map(x => 
         (Array.apply(null, {length: 5}).map(x => Object.assign({ hasDot: false, color: null}) )))
       this.startDot.row = null
       this.endDot.row = null
+      this.isDone = false;
     },
     clearCircle: function(dot) {
       this.grid[dot.row].splice(dot.col, 1, { hasDot: false, color: null})
     },
 
     runClick: function () {
+      if (this.startDot.row == null || this.endDot.row == null) {
+        alert("Need start and end points set!");
+        return;
+      }
+      console.log('end ', this.endDot);
+      console.log('start ', this.startDot);
       this.counter = 0;
       const row = this.startDot.row
       const col = this.startDot.col
@@ -129,41 +139,38 @@ export default {
       if (row >= 0 &&
          row < this.width && 
          col >= 0 &&
-         col < this.height) {
+         col < this.height &&
+         !this.isDone) {
         let level = l
         console.log('location: ', row, ' x ', col, ' Level: ', level)
-        // this.grid[this.endDot.row][this.endDot.col].hasDot
+        if (this.endDot.row == row && this.endDot.col == col) {
+          console.log('FOUND IT!')
+          this.isDone = true;
+          return true
+        }
         
-        if (row + 1 < this.width) {
+        if (row + 1 < this.width && !this.isDone) {
           // debugger
-          console.log('try 1')
-          // setTimeout(
+          console.log('try 1', this.isDone)
           if (this.setCircle(row + 1, col, level))
-            this.fillTable(row + 1, col, 1 + level);
-            // , 1);
+            return this.fillTable(row + 1, col, 1 + level)
         }
-        if (col + 1 < this.height) {
+        if (col + 1 < this.height && !this.isDone) {
           console.log('try 2')
-            // setTimeout(
-              // , 1);
-            if (this.setCircle(row, col + 1, level))
-              this.fillTable(row, col + 1, 1 + level);
-          }
-        if (row - 1 >= 0) {
+          if (this.setCircle(row, col + 1, level))
+            return this.fillTable(row, col + 1, 1 + level)
+        }
+        if (row - 1 >= 0 && !this.isDone) {
           console.log('try 3')
-          // setTimeout(
           if (this.setCircle(row - 1, col, level))
-            this.fillTable(row - 1, col, level + 1);
-            // , 1);
+            return this.fillTable(row - 1, col, level + 1)
         }
-        if (col - 1 >= 0) {
+        if (col - 1 >= 0 && !this.isDone) {
           console.log('try 4')
-          // setTimeout(
           if (this.setCircle(row, col - 1, level))
-            this.fillTable(row, col - 1, level + 1);
-            // , 1);
+            return this.fillTable(row, col - 1, level + 1)
         }
-        
+        return false
       }
 
     },
@@ -173,7 +180,7 @@ export default {
         this.grid[row].splice(col, 1, {hasDot: true, color: color[pathColor], delay: delay + 's'})
         return true;
       }
-      return false;
+      return row == this.endDot.row && col == this.endDot.col
     },
   },
 
