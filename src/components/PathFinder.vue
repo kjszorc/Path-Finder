@@ -48,7 +48,17 @@
 /* eslint-disable */
 const start = 0,
       wall  = 1,
-      end   = 2;
+      end   = 2,
+      path  = 3;
+
+const dot = {
+  start: 0,
+  wall: 1,
+  end: 2,
+  path: 3,
+};
+
+Object.freeze(dot);
 
 const color = {
   0: 'blue',
@@ -71,7 +81,7 @@ export default {
       height: 5,
       width: 5,
       grid: Array.apply(null, {length: 5}).map(x => 
-              (Array.apply(null, {length: 5}).map(x => Object.assign({ hasDot: false, color: null}) ))),
+              (Array.apply(null, {length: 5}).map(x => Object.assign({ hasDot: false, color: null, type: ''}) ))),
       startDot: {
         'row': null,
         'col': null,
@@ -94,7 +104,7 @@ export default {
           this.clearCircle(this.startDot);
         this.startDot.row = row;
         this.startDot.col = col;
-        this.grid[row].splice(col, 1, {hasDot: true, color: color[this.pointType]})
+        this.grid[row].splice(col, 1, {hasDot: true, color: color[this.pointType], type: 'start'})
       }
       else if (this.pointType == wall) {
         if (this.grid[row][col][0])
@@ -149,26 +159,25 @@ export default {
           return true
         }
         
-        if (row + 1 < this.width && !this.isDone) {
-          // debugger
-          console.log('try 1', this.isDone)
+        if (row + 1 < this.width) {
+          console.log('try 1')
           if (this.setCircle(row + 1, col, level))
-            return this.fillTable(row + 1, col, 1 + level)
+            this.fillTable(row + 1, col, 1 + level)
         }
-        if (col + 1 < this.height && !this.isDone) {
+        if (col + 1 < this.height) {
           console.log('try 2')
           if (this.setCircle(row, col + 1, level))
-            return this.fillTable(row, col + 1, 1 + level)
+            this.fillTable(row, col + 1, 1 + level)
         }
-        if (row - 1 >= 0 && !this.isDone) {
+        if (row - 1 >= 0) {
           console.log('try 3')
           if (this.setCircle(row - 1, col, level))
-            return this.fillTable(row - 1, col, level + 1)
+            this.fillTable(row - 1, col, level + 1)
         }
-        if (col - 1 >= 0 && !this.isDone) {
+        if (col - 1 >= 0) {
           console.log('try 4')
           if (this.setCircle(row, col - 1, level))
-            return this.fillTable(row, col - 1, level + 1)
+            this.fillTable(row, col - 1, level + 1)
         }
         return false
       }
