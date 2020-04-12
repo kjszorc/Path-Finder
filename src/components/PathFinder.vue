@@ -27,12 +27,12 @@
           <input type="number" max="30" v-model="height">
         </label>
         <label>Width:
-          <input type="number" v-model="width">
+          <input type="number" max="30" v-model="width">
         </label>
-        <button class="btn--set" @click="resetSquare">Set</button>
+        <button class="btn--set" @click="clearGridClick">Set</button>
       </div>
       <label>Algorithim type:
-        <select>
+        <select v-model="algorithimType">
           <option value="DFS">Depth First Search</option>
           <option value="BFS">Breath First Search</option>
         </select>
@@ -80,6 +80,8 @@ const color = {
   'path': 'orange',
 };
 
+const startSquareSize = 10;
+const maxSquareLength = 30;
 // maybe we can make the array class based
 class cell {
 
@@ -91,10 +93,10 @@ export default {
       msg: 'A small Vue.js App',
       loaded: false,
       pointType: 0,
-      height: 5,
-      width: 5,
-      grid: Array.apply(null, {length: 5}).map(x => 
-              (Array.apply(null, {length: 5}).map(x => Object.assign({ hasDot: false, color: null, type: ''}) ))),
+      height: startSquareSize,
+      width: startSquareSize,
+      grid: Array.apply(null, {length: startSquareSize}).map(x => 
+              (Array.apply(null, {length: startSquareSize}).map(x => Object.assign({ hasDot: false, color: null, type: ''}) ))),
       startDot: {
         'row': null,
         'col': null,
@@ -104,6 +106,7 @@ export default {
         'col': null,
       },
       isDone: false,
+      algorithimType: 'DFS',
       steps: 10,
     }
   },
@@ -112,9 +115,6 @@ export default {
     this.loaded = true;
   },
   methods: {
-    resetSquare: function() {
-      this.$forceUpdate();
-    },
     squareClick: function (row, col) {
       if (this.pointType == start) {
         if (this.startDot.row != null)
@@ -138,8 +138,15 @@ export default {
       }
     },
     clearGridClick: function () {
-      this.grid = Array.apply(null, {length: this.height}).map(x => 
-        (Array.apply(null, {length: this.width}).map(x => Object.assign({ hasDot: false, color: null}) )))
+      if (this.height > 1 && this.height > maxSquareLength) {
+        alert(`Height must be within 0 and ${maxSquareLength}`);
+      }
+      if (this.width > 1 && this.width > maxSquareLength) {
+        alert(`Width must be within 0 and ${maxSquareLength}`);
+      }
+
+      this.grid = Array.apply(null, {length: this.width}).map(x => 
+        (Array.apply(null, {length: this.height}).map(x => Object.assign({ hasDot: false, color: null}) )))
       this.startDot.row = null
       this.endDot.row = null
       this.isDone = false;
@@ -162,7 +169,14 @@ export default {
 
       this.backupTable = Object.assign(this.grid); // lets make a backup
 
-      this.fillTable(row, col);
+      switch (algorithimType) {
+        case ('DFS'): 
+          this.depthFirstSearch(row, col);
+          break;
+        case ('BFS'):
+          // TODO: add
+          break;
+      }
     },
     reRunClick: function() {
       // we will need to know the type of dots to distinguish walls from paths
@@ -171,7 +185,7 @@ export default {
       // this.runClick();
     },
     // level is not passed in by value? but by reference
-    fillTable: function(row, col, l = 1) {
+    depthFirstSearch: function(row, col, l = 1) {
       if (row >= 0 &&
           row < this.width && 
           col >= 0 &&
