@@ -106,7 +106,7 @@ export default {
         'col': null,
       },
       isDone: false,
-      algorithimType: 'DFS',
+      algorithimType: 'BFS',//'DFS',
       steps: 10,
     }
   },
@@ -168,13 +168,15 @@ export default {
       // const level = 0
 
       this.backupTable = Object.assign(this.grid); // lets make a backup
-
-      switch (algorithimType) {
+      debugger;
+      
+      switch (this.algorithimType) {
         case ('DFS'): 
           this.depthFirstSearch(row, col);
           break;
         case ('BFS'):
           // TODO: add
+          this.breathFirstSearch(row, col)
           break;
       }
     },
@@ -202,39 +204,66 @@ export default {
         if (row + 1 < this.width) {
           console.log('try 1')
           if (this.setCircle(row + 1, col, level)) {
-            if (this.fillTable(row + 1, col, 1 + level))
+            if (this.depthFirstSearch(row + 1, col, 1 + level))
               return true;
           }
         }
         if (col + 1 < this.height) {
           console.log('try 2')
           if (this.setCircle(row, col + 1, level)) {
-            if (this.fillTable(row, col + 1, 1 + level))
+            if (this.depthFirstSearch(row, col + 1, 1 + level))
               return true;
           }
         }
         if (row - 1 >= 0) {
           console.log('try 3')
           if (this.setCircle(row - 1, col, level)) {
-            if (this.fillTable(row - 1, col, level + 1))
+            if (this.depthFirstSearch(row - 1, col, level + 1))
               return true;
           }
         }
         if (col - 1 >= 0) {
           console.log('try 4')
           if (this.setCircle(row, col - 1, level)) {
-            if (this.fillTable(row, col - 1, level + 1))
+            if (this.depthFirstSearch(row, col - 1, level + 1))
               return true;
           }
         }
         return false
       }
+    },
+    breathFirstSearch(row, col) {
+      let searchAble = [];
+      searchAble.push({row, col});
+      this.grid[row][col].isVisited = true;
+      let delay = 1;
+
+      while (searchAble.length > 0 && !this.isDone) {
+        let nextDot = searchAble.shift();
+        if (this.endDot.row == nextDot.row && this.endDot.col == nextDot.col) {
+          console.log('FOUND IT!')
+          this.isDone = true;
+          return true;
+        }
+        if (nextDot.row + 1 < this.width && !this.grid[nextDot.row + 1, nextDot.col].isVisited) {
+          if (this.setCircle(nextDot.row + 1, nextDot.col, delay)) {
+            searchAble.push({row: nextDot.row + 1, col: nextDot.col});
+          }
+        }
+        if (nextDot.row - 1 >= 0 && !this.grid[nextDot.row - 1, nextDot.col].isVisited) {
+          if (this.setCircle(nextDot.row - 1, nextDot.col, delay)) {
+            searchAble.push({row: nextDot.row - 1, col: nextDot.col});
+          }
+        }
+
+        delay += 1;
+      }
 
     },
-
     setCircle: function (row, col, delay, pathColor = 'path') {
       if (this.grid[row][col].hasDot == false){
-        this.grid[row].splice(col, 1, {hasDot: true, color: color[pathColor], delay: delay + 's'})
+        let animationDelay = (delay * 5) / (this.height * this.width);
+        this.grid[row].splice(col, 1, {hasDot: true, color: color[pathColor], delay: delay + 's', isVisited: true})
         return true;
       }
       return row == this.endDot.row && col == this.endDot.col
