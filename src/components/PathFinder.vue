@@ -46,6 +46,7 @@
         <tr v-for="(rowValue, row, index) in grid" :key="index" ref="row">
           <td v-for="(colValue, col, indexC) in rowValue" :key="indexC" class="square" ref="col" @click="squareClick(row, col, $event)">
             <div :class="[{'circle':  colValue.hasDot}, colValue.color]" :style="{ 'animation-duration': colValue.delay}">
+            <!-- <div :class="[{'circle':  colValue.hasDot}, colValue.color]" :style="{ 'animation-delay': colValue.delay}"> -->
               <!-- {{row }},{{col}}, -->
               {{colValue.delay}}
             </div>
@@ -168,8 +169,7 @@ export default {
       // const level = 0
 
       this.backupTable = Object.assign(this.grid); // lets make a backup
-      debugger;
-      
+
       switch (this.algorithimType) {
         case ('DFS'): 
           this.depthFirstSearch(row, col);
@@ -255,15 +255,25 @@ export default {
             searchAble.push({row: nextDot.row - 1, col: nextDot.col});
           }
         }
-
+        if (nextDot.col - 1 >= 0 && !this.grid[nextDot.row, nextDot.col - 1].isVisited) {
+          if (this.setCircle(nextDot.row, nextDot.col - 1, delay)) {
+            searchAble.push({row: nextDot.row, col: nextDot.col - 1});
+          }
+        }
+        if (nextDot.col + 1 < this.height && !this.grid[nextDot.row, nextDot.col + 1].isVisited) {
+          if (this.setCircle(nextDot.row, nextDot.col + 1, delay)) {
+            searchAble.push({row: nextDot.row, col: nextDot.col + 1});
+          }
+        }
         delay += 1;
       }
 
     },
     setCircle: function (row, col, delay, pathColor = 'path') {
       if (this.grid[row][col].hasDot == false){
-        let animationDelay = (delay * 5) / (this.height * this.width);
-        this.grid[row].splice(col, 1, {hasDot: true, color: color[pathColor], delay: delay + 's', isVisited: true})
+        // let animationDelay = (delay * (this.width + this.height) / 2 ) / (this.height * this.width);
+        let animationDelay = delay * 0.25;
+        this.grid[row].splice(col, 1, {hasDot: true, color: color[pathColor], delay: animationDelay + 's', isVisited: true})
         return true;
       }
       return row == this.endDot.row && col == this.endDot.col
@@ -317,7 +327,10 @@ label {
   border-radius: 50%;
   display: inline-block;
   margin: auto;
-  animation: changeColor 1s;
+  animation: changeColor 1s linear;
+  
+  /* anim */
+  /* animation-duration: 1s; */
 }
 
 .circle.orange {
