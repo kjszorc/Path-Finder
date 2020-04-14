@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div v-on:click.shift.exact="quickChangePointType">
     <h1>{{ msg }}</h1>
     <section class="app--settings">
       <div class="dot-options">
@@ -45,8 +45,9 @@
       <tbody>
         <tr v-for="(rowValue, row, index) in grid" :key="index" ref="row">
           <td v-for="(colValue, col, indexC) in rowValue" :key="indexC" class="square" ref="col" @click="squareClick(row, col, $event)">
-            <div :class="[{'circle':  colValue.hasDot}, colValue.color]" :style="{ 'animation-duration': colValue.delay}">
+            <!-- <div :class="[{'circle':  colValue.hasDot}, colValue.color]" :style="{ 'animation-duration': colValue.delay}"> -->
             <!-- <div :class="[{'circle':  colValue.hasDot}, colValue.color]" :style="{ 'animation-delay': colValue.delay}"> -->
+            <div :class="[{'circle':  colValue.hasDot}, colValue.color]">
               <!-- {{row }},{{col}}, -->
               {{colValue.delay}}
             </div>
@@ -157,6 +158,11 @@ export default {
     },
 
     runClick: function () {
+      // this is for testing only
+      // this.squareClick(1, 1);
+      // this.pointType = end;
+      // this.squareClick(4, 4);
+
       if (this.startDot.row == null || this.endDot.row == null) {
         alert("Need start and end points set!");
         return;
@@ -164,8 +170,8 @@ export default {
       console.log('end ', this.endDot);
       console.log('start ', this.startDot);
       this.counter = 0;
-      const row = this.startDot.row
-      const col = this.startDot.col
+      const row = this.startDot.row;
+      const col = this.startDot.col;
       // const level = 0
 
       this.backupTable = Object.assign(this.grid); // lets make a backup
@@ -270,14 +276,24 @@ export default {
 
     },
     setCircle: function (row, col, delay, pathColor = 'path') {
-      if (this.grid[row][col].hasDot == false){
+      if (this.grid[row][col].hasDot == false && !this.grid[row][col].isVisited){
         // let animationDelay = (delay * (this.width + this.height) / 2 ) / (this.height * this.width);
         let animationDelay = delay * 0.25;
-        this.grid[row].splice(col, 1, {hasDot: true, color: color[pathColor], delay: animationDelay + 's', isVisited: true})
+
+        // this.grid[row].splice(col, 1, {hasDot: true, color: color[pathColor], delay: animationDelay + 's', isVisited: true})
+        setTimeout(() => 
+          this.grid[row].splice(col, 1, {hasDot: true, color: color[pathColor], delay: animationDelay + 's', isVisited: true}),
+           animationDelay*300);
         return true;
       }
       return row == this.endDot.row && col == this.endDot.col
     },
+    quickChangePointType: function() {
+      this.pointType += 1;
+      if (this.pointType > dot.end) {
+        this.pointType = dot.start;
+      }
+    }
   },
 
 
@@ -286,9 +302,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#app {
-  background-color: darkslateblue;
-}
 h1, h2 {
   font-weight: normal;
 }
@@ -315,7 +328,7 @@ label {
   position: relative;
 
 }
-.square:hover {
+.table-path:hover {
   cursor: pointer;
 }
 .circle {
@@ -327,7 +340,6 @@ label {
   border-radius: 50%;
   display: inline-block;
   margin: auto;
-  animation: changeColor 1s linear;
   
   /* anim */
   /* animation-duration: 1s; */
@@ -335,15 +347,21 @@ label {
 
 .circle.orange {
   background-color: orange;
+
+  animation: changeColor 1s linear;
+  animation-delay: 3s;
 }
 .circle.blue {
   background-color: blue;
+  animation: changeColor 1s linear;
 }
 .circle.purple {
   background-color: purple;
+  animation: changeColor 1s linear;
 }
 .circle.red {
   background-color: red;
+  animation: changeColor 1s linear;
 }
 
 .btn--start {
