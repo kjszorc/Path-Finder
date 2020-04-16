@@ -2,7 +2,7 @@
   "name": "path_finder",
   "version": "1.0.0",
   "description": "A Vue.js project",
-  "author": "kjszorc <kjszorc@yahoo.com>",
+  "author": "kjszorc <kjszorc@gmail.com>",
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
